@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.vite/
+coverage/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+*.db
+*.sqlite*
+*.log
+*.egg-info/
+desktop/dist-electron/
+.DS_Store
+
