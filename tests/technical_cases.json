@@ -1,0 +1,67 @@
+[
+  {
+    "name": "database_with_distractions",
+    "question": "Como criar um índice no PostgreSQL, banana azul, meu gato toca guitarra, amanhã vou comprar pão, voltando à pergunta, para acelerar consultas por e-mail em uma tabela de clientes com milhões de registros?",
+    "expected_behavior": "Explain a PostgreSQL index on email, preferably CREATE INDEX CONCURRENTLY, and query-plan verification. Ignore unrelated chatter."
+  },
+  {
+    "name": "cache_with_distractions",
+    "question": "Como evitar cache stampede no Redis? Meu sapato voa e o café acabou. Voltando: milhares de pedidos chegam quando a mesma chave expira.",
+    "expected_behavior": "Discuss request coalescing or a lock, TTL jitter or stale-while-revalidate. Do not elaborate on shoes or coffee."
+  },
+  {
+    "name": "network_diagnosis",
+    "question": "Meu serviço abre pelo IP, mas não pelo domínio. Como investigar DNS no Linux?",
+    "expected_behavior": "Give DNS diagnostic commands and distinguish resolution from HTTP Host/TLS configuration."
+  },
+  {
+    "name": "unintelligible_transcript",
+    "question": "Como criar um índice no postrilésio que ele, banana azul, gato guitarra e um cabelo adipimento e doente de regiante.",
+    "expected_behavior": "Ask a brief clarification instead of inventing meanings or assuming a specific database."
+  },
+  {
+    "name": "csharp_async",
+    "question": "Em C#, qual é a diferença entre async/await e Task.Run? Quando usar cada um no ASP.NET Core?",
+    "expected_behavior": "Distinguir espera assíncrona de execução no pool. Preferir APIs de I/O assíncronas. Não recomendar Task.Run imediatamente aguardado como otimização de requisições ASP.NET Core.",
+    "sources": ["https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices"]
+  },
+  {
+    "name": "dotnet_di",
+    "question": "Qual a diferença entre Singleton, Scoped e Transient? Posso usar um DbContext Scoped dentro de um Singleton?",
+    "expected_behavior": "Explicar uma instância por contêiner, escopo e resolução, respectivamente. Não capturar Scoped em Singleton nem resolver diretamente do provedor raiz. Se necessário, criar e descartar escopo explícito via IServiceScopeFactory.",
+    "sources": ["https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/service-lifetimes"]
+  },
+  {
+    "name": "ef_tracking",
+    "question": "Quando usar AsNoTracking no EF Core? Funciona com Include? Posso chamar AsNoTracking().FindAsync(id)? E o SaveChanges?",
+    "expected_behavior": "Indicar leitura sem rastreamento e compatibilidade com Include. Rejeitar AsNoTracking().FindAsync: FindAsync é método de DbSet, não IQueryable. Sugerir FirstOrDefaultAsync com predicado. SaveChanges não detecta automaticamente alterações nas entidades não rastreadas.",
+    "sources": ["https://learn.microsoft.com/en-us/ef/core/querying/tracking", "https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.entityframeworkqueryableextensions.asnotracking"]
+  },
+  {
+    "name": "dotnet_with_distractions",
+    "question": "No ASP.NET Core, meu gato toca guitarra, banana azul, amanhã compro pão, voltando: por que não devo usar .Result numa chamada HTTP assíncrona?",
+    "expected_behavior": "Focar em bloqueio de threads e perda de escalabilidade; preferir await. Não inventar um deadlock inevitável no ASP.NET Core nem responder sobre gato, pão ou banana.",
+    "sources": ["https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices"]
+  },
+  {
+    "name": "literal_not_distraction",
+    "question": "No PostgreSQL, minha tabela se chama banana_azul e a coluna gato_guitarra guarda o email. Como criar um índice nessa coluna sem exigir valores únicos?",
+    "expected_behavior": "Preservar os identificadores explicitamente declarados, não removê-los como distração. Propor índice não UNIQUE em banana_azul(gato_guitarra).",
+    "sources": ["https://www.postgresql.org/docs/current/sql-createindex.html"]
+  },
+  {
+    "name": "sql_parameters",
+    "question": "Como consultar um usuário pelo email recebido em uma API sem concatenar esse valor no SQL?",
+    "expected_behavior": "Explicar parâmetros vinculados pelo driver ou ORM e distinguir valores de identificadores. Não sugerir concatenação ou escaping manual como solução principal."
+  },
+  {
+    "name": "testing_strategy",
+    "question": "Qual a diferença entre teste unitário, de integração e ponta a ponta numa API .NET?",
+    "expected_behavior": "Distinguir unidade isolada, integração entre componentes e fluxo completo. Dar exemplos concretos sem dizer que mocks provam a integração real."
+  },
+  {
+    "name": "incomplete_technology",
+    "question": "Como eu configuro aquele negócio para ficar mais rápido?",
+    "expected_behavior": "Pedir qual tecnologia, operação e sintoma. Não assumir banco, linguagem ou uma solução específica sem contexto."
+  }
+]

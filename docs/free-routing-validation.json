@@ -1,0 +1,8 @@
+{
+  "test": "live_backend_auto_without_openrouter_key",
+  "question": "Como investigar uma API lenta antes de escolher uma otimizacao?",
+  "first_delta_seconds": 10.422000000020489,
+  "total_seconds": 14.797000000020489,
+  "answer": "Para investigar uma API lenta, eu começo isolando o gargalo: é no processamento da lógica, na espera por um banco de dados ou em chamadas externas? Na prática, eu uso ferramentas como `curl` com `-v` para ver os cabeçalhos e tempos de resposta brutos, ou o `chrome://tracing` se for uma aplicação web.\n\nSe a latência estiver alta, meu primeiro passo é olhar o log do servidor ou usar um APM (Application Performance Monitoring) para ver onde o tempo está sendo gasto. Se for banco de dados, eu verifico o plano de execução da query mais pesada; muitas vezes há índices faltando ou uma varredura completa na tabela.\n\nSe for rede, checo se há timeouts em serviços externos ou se a resposta do servidor é muito grande. Antes de qualquer otimização, como adicionar um índice ou mudar para cache, eu preciso confirmar que o problema é realmente ali e não em outra camada. Só então aplico a correção e meço o impacto novamente.",
+  "openrouter_live_test": "not_run_missing_key"
+}

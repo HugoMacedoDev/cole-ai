@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
@@ -16,19 +17,27 @@ from .contracts import (
     SessionStarted,
 )
 from .ollama import available as ollama_available, ollama_model
-from .session import SessionManager
+from .session import Session, SessionManager
+from .speech_pipeline import SpeechPipeline
 from .simulator import answer_question, run_simulation
+from .transcription_service import service as transcription_service
 
 logging.basicConfig(
     level=logging.INFO,
     format='{"time":"%(asctime)s","level":"%(levelname)s","logger":"%(name)s","message":"%(message)s"}',
 )
 logger = logging.getLogger(__name__)
-app = FastAPI(title="Cola AI local backend", version="0.1.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    await transcription_service.close()
+
+
+app = FastAPI(title="Cola AI local backend", version="0.1.0", lifespan=lifespan)
 sessions = SessionManager()
 
 
-async def forward_audio_levels(manager: SessionManager, session, levels: asyncio.Queue[float]) -> None:
+async def forward_audio_levels(manager: SessionManager, session: Session, levels: asyncio.Queue[float]) -> None:
     while True:
         level = await levels.get()
         await manager.send(session, AudioLevel(
@@ -37,9 +46,15 @@ async def forward_audio_levels(manager: SessionManager, session, levels: asyncio
         await asyncio.sleep(0.08)
 
 
-async def start_audio_capture(session) -> None:
+async def start_audio_capture(session: Session) -> None:
     if session.audio_capture and session.audio_capture.active:
         return
+    if session.speech_pipeline:
+        await session.speech_pipeline.stop()
+    if session.audio_task:
+        session.audio_task.cancel()
+    if session.audio_capture:
+        await asyncio.to_thread(session.audio_capture.stop)
     levels: asyncio.Queue[float] = asyncio.Queue(maxsize=1)
     loop = asyncio.get_running_loop()
 
@@ -50,8 +65,14 @@ async def start_audio_capture(session) -> None:
             levels.put_nowait(level)
         loop.call_soon_threadsafe(add_level)
 
-    capture = WasapiLoopbackCapture(push_level)
-    await asyncio.to_thread(capture.start)
+    pipeline = SpeechPipeline(sessions, session)
+    capture = WasapiLoopbackCapture(push_level, pipeline.feed)
+    try:
+        await asyncio.to_thread(capture.start)
+    except BaseException:
+        await pipeline.stop()
+        raise
+    session.speech_pipeline = pipeline
     session.audio_capture = capture
     session.audio_task = asyncio.create_task(forward_audio_levels(sessions, session, levels))
 
@@ -104,6 +125,9 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
                         session_id=session.id, code="audio_capture_failed", message=str(error)
                     ))
             elif message.get("type") == "audio.capture.stop":
+                if session.speech_pipeline:
+                    await session.speech_pipeline.stop()
+                    session.speech_pipeline = None
                 if session.audio_task and not session.audio_task.done():
                     session.audio_task.cancel()
                 if session.audio_capture:

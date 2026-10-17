@@ -1,0 +1,29 @@
+[
+  {
+    "history": 2,
+    "pending": false,
+    "streaming": false,
+    "answer": "[Resposta pronta · base local]\nEu usaria AsNoTracking em consultas de leitura quando não preciso que o contexto acompanhe alterações nas entidades retornadas. Ele funciona com Include. AsNoTracking retorna IQueryable, portanto não permite encadear FindAsync, que pertence ao DbSet; para buscar por chave nessa consulta, usaria FirstOrDefaultAsync com um predicado e trataria resultado nulo. SaveChanges não detecta automaticamente mudanças em objetos não rastreados. Para editar, eu consultaria com tracking ou anexaria a entidade e marcaria cuidadosamente as alterações.",
+    "question": "Quando usar AsNoTracking no EF Core?",
+    "name": "technical_ready",
+    "seconds": 0.109
+  },
+  {
+    "history": 3,
+    "pending": false,
+    "streaming": false,
+    "answer": "[IA indisponível]\n[Roteiro local · ainda sem resposta específica]\nSobre motivação para a vaga, organize a resposta em contexto, evidências, decisão e aprendizado. Escolha uma situação verdadeira da sua trajetória, explique o que você analisou, quais alternativas considerou e como colaborou com as pessoas envolvidas. Conclua com o resultado que consegue comprovar e o que faria diferente. Se a pergunta pressupõe uma experiência que você não teve, diga isso e explique como agiria.",
+    "question": "Como você avaliaria se motivação para a vaga é necessário antes de adotá-lo?",
+    "name": "csv_guide",
+    "seconds": 1.172
+  },
+  {
+    "history": 4,
+    "pending": false,
+    "streaming": false,
+    "answer": "[Resposta pronta · base local]\nEu começaria ouvindo as pessoas e separando fatos, hipóteses e preferências. Depois, alinharia o objetivo comum e compararia as opções com critérios como impacto, prazo, manutenção e risco. Quando a divergência for técnica, proporia um teste pequeno para obter evidências. Se ainda houver impasse, levaria as alternativas e seus efeitos a quem tem responsabilidade pela decisão, mantendo respeito pela equipe.",
+    "question": "Como você lida com conflitos na equipe?",
+    "name": "hr_ready",
+    "seconds": 0.11
+  }
+]

@@ -7,6 +7,8 @@ import threading
 from collections.abc import Callable
 from typing import Any
 
+from .transcription import AudioChunk
+
 
 class AudioCaptureError(RuntimeError):
     """Raised when the Windows system-output capture cannot be started."""
@@ -15,8 +17,11 @@ class AudioCaptureError(RuntimeError):
 class WasapiLoopbackCapture:
     """Captures Windows system output through the WASAPI loopback device."""
 
-    def __init__(self, on_level: Callable[[float], None]) -> None:
+    def __init__(self, on_level: Callable[[float], None], on_audio: Callable[[AudioChunk], None] | None = None) -> None:
         self._on_level = on_level
+        self._on_audio = on_audio
+        self._sample_rate = 48000
+        self._channels = 2
         self._audio: Any | None = None
         self._stream: Any | None = None
         self._lock = threading.Lock()
@@ -39,6 +44,8 @@ class WasapiLoopbackCapture:
         try:
             self._audio = pyaudio.PyAudio()
             device = self._audio.get_default_wasapi_loopback()
+            self._sample_rate = int(device["defaultSampleRate"])
+            self._channels = int(device["maxInputChannels"])
             self._chunk = max(256, int(os.getenv("COLA_AUDIO_CHUNK_FRAMES", "1024")))
             self._stream = self._audio.open(
                 format=pyaudio.paInt16,
@@ -62,6 +69,9 @@ class WasapiLoopbackCapture:
             self._stream, self._audio = None, None
             self._reader = None
             self._stop.set()
+        # Let the blocking read finish before closing its native stream.
+        if reader is not None and reader is not threading.current_thread():
+            reader.join(timeout=2)
         if stream is not None:
             try:
                 if stream.is_active():
@@ -86,6 +96,8 @@ class WasapiLoopbackCapture:
                 data = stream.read(self._chunk, exception_on_overflow=False)
                 rms = audioop.rms(data, 2)
                 self._on_level(min(1.0, math.sqrt(rms / 32768)))
+                if self._on_audio:
+                    self._on_audio(AudioChunk(data, self._sample_rate, self._channels))
             except Exception:
                 if not self._stop.is_set():
                     self._stop.set()

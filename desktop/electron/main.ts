@@ -24,7 +24,7 @@ async function startLocalBackend(): Promise<void> {
     console.warn("Cola AI backend not started: Python environment missing.");
     return;
   }
-  backendProcess = spawn(python, ["-m", "uvicorn", "backend.app.main:app", "--host", "127.0.0.1", "--port", "8000"], {
+  backendProcess = spawn(python, ["-m", "uvicorn", "backend.app.main:app", "--host", "127.0.0.1", "--port", "8000", ...(existsSync(path.join(projectRoot, ".env")) ? ["--env-file", path.join(projectRoot, ".env")] : [])], {
     cwd: projectRoot,
     windowsHide: true,
     stdio: "ignore",

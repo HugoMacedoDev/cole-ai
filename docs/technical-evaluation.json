@@ -1,0 +1,186 @@
+{
+  "provider": "ollama",
+  "model": "qwen3.5:9b",
+  "scope": "Texto direto ao provedor; não valida áudio ou interface. Qualidade requer revisão humana.",
+  "results": [
+    {
+      "case": {
+        "name": "database_with_distractions",
+        "question": "Como criar um índice no PostgreSQL, banana azul, meu gato toca guitarra, amanhã vou comprar pão, voltando à pergunta, para acelerar consultas por e-mail em uma tabela de clientes com milhões de registros?",
+        "expected_behavior": "Explain a PostgreSQL index on email, preferably CREATE INDEX CONCURRENTLY, and query-plan verification. Ignore unrelated chatter.",
+        "sources": []
+      },
+      "status": "completed",
+      "answer": "Para acelerar consultas filtrando por e-mail na sua tabela de clientes, você precisa criar um índice B-tree no campo `email`. Na prática, eu costumo fazer isso com o comando `CREATE INDEX` apontando especificamente para a coluna que está na cláusula WHERE da sua query. Se o seu e-mail for único, um índice simples resolve; se houver duplicatas, talvez valha a pena considerar um índice parcial ou verificar se a lógica de negócio realmente permite múltiplos registros por e-mail. Lembre-se que criar índices melhora a leitura, mas pode tornar escritas mais lentas, então avalie o volume de dados antes de aplicar em produção.",
+      "first_delta_seconds": 0.625,
+      "total_seconds": 3.515999999974156,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "cache_with_distractions",
+        "question": "Como evitar cache stampede no Redis? Meu sapato voa e o café acabou. Voltando: milhares de pedidos chegam quando a mesma chave expira.",
+        "expected_behavior": "Discuss request coalescing or a lock, TTL jitter or stale-while-revalidate. Do not elaborate on shoes or coffee.",
+        "sources": []
+      },
+      "status": "completed",
+      "answer": "Para evitar cache stampede no Redis, você pode usar uma estratégia simples de \"padronização\" da leitura. Quando um pedido chega para buscar uma chave que está expirando, em vez de tentar pegar o valor diretamente do Redis e falhar, você primeiro verifica se existe algum valor antigo ainda válido ou usa um mecanismo de bloqueio leve.\n\nUma abordagem comum é usar a instrução `GET` com um tempo de espera curto, mas isso não resolve totalmente o problema de concorrência massiva. O ideal é implementar uma fila de requisições ou usar um padrão onde você tenta ler do Redis e, se falhar, inicia uma tarefa assíncrona para recalcular o valor enquanto mantém uma resposta em cache temporário para os outros usuários.\n\nOutra técnica eficaz é usar a instrução `MGET` se as chaves forem relacionadas, mas no caso de uma única chave expirando, o melhor é usar um \"lock\" simples com `SETNX` por um tempo muito curto antes de tentar ler. Se não houver lock disponível, você pode usar a estratégia de \"fail-fast\" com fallback para banco de dados primário, garantindo que apenas um thread recalcule o valor enquanto os outros aguardam ou recebem uma resposta em cache degradada.\n\nNo código, isso seria algo como:\n```python\nif redis.get(key):\n    return redis.get(key)\nelse:\n    # Tenta bloquear brevemente para recalcular\n    if redis.setnx(key, \"calculando\", ex=1):\n        valor = calcular_valor()\n        redis.setex(key, ttl, valor)\n    else:\n        return redis.get(key) # Retorna valor antigo ou cache degradado\n```\n\nIsso garante que apenas um processo recalcule o valor pesado enquanto os outros aguardam ou recebem uma resposta rápida.",
+      "first_delta_seconds": 0.4539999999979045,
+      "total_seconds": 7.9539999999979045,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "network_diagnosis",
+        "question": "Meu serviço abre pelo IP, mas não pelo domínio. Como investigar DNS no Linux?",
+        "expected_behavior": "Give DNS diagnostic commands and distinguish resolution from HTTP Host/TLS configuration.",
+        "sources": []
+      },
+      "status": "completed",
+      "answer": "Para investigar o DNS no Linux, primeiro verifique se seu sistema está resolvendo corretamente usando `dig @8.8.8.8 seu-dominio.com` ou `nslookup`. Se funcionar com um servidor externo mas não localmente, o problema é a configuração do seu próprio resolver.\n\nNo `/etc/resolv.conf`, veja quais servidores DNS estão listados e se há uma opção `options timeout:2 attempts:3`. Às vezes, o systemd-resolved usa um arquivo de cache em `/run/systemd/resolve/stub-resolv.conf` que pode estar desatualizado ou configurado para não resolver certos domínios.\n\nTambém vale checar se há regras de firewall bloqueando a porta 53 na saída da sua máquina, embora isso seja raro para o próprio servidor. Se você usa um DNS interno, confirme se ele está respondendo às consultas e se o registro A ou AAAA do domínio está correto nas zonas DNS.\n\nPor fim, teste com `host seu-dominio.com` para ver a resposta direta do resolver local.",
+      "first_delta_seconds": 0.45300000000861473,
+      "total_seconds": 4.76500000001397,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "unintelligible_transcript",
+        "question": "Como criar um índice no postrilésio que ele, banana azul, gato guitarra e um cabelo adipimento e doente de regiante.",
+        "expected_behavior": "Ask a brief clarification instead of inventing meanings or assuming a specific database.",
+        "sources": []
+      },
+      "status": "completed",
+      "answer": "Parece que o Postgres está com a transcrição meio bagunçada, mas entendi: você quer criar um índice na tabela `banana_azul` nas colunas `gato_guitarra`, `cabelo_adipimento` e `doente_regiante`.\n\nPara fazer isso no PostgreSQL, use o comando `CREATE INDEX`. Se for uma única coluna, é simples, mas como tem três campos, você provavelmente quer um índice composto para consultas que filtram por esses atributos juntos. O nome do índice pode ser algo descritivo, tipo `idx_banana_gato_cabelo_doente`.\n\nO comando ficaria assim:\n\n```sql\nCREATE INDEX idx_banana_gato_cabelo_doente \nON banana_azul (gato_guitarra, cabelo_adipimento, doente_regiante);\n```\n\nIsso cria um índice B-tree padrão. Se você precisar de buscas em qualquer ordem dessas colunas, talvez precise de índices separados ou considerar `GIN` se os dados forem arrays ou JSONB. Lembre-se que criar índices melhora leituras, mas pode deixar escritas mais lentas.",
+      "first_delta_seconds": 0.46899999998277053,
+      "total_seconds": 5.140999999974156,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "csharp_async",
+        "question": "Em C#, qual é a diferença entre async/await e Task.Run? Quando usar cada um no ASP.NET Core?",
+        "expected_behavior": "Distinguir espera assíncrona de execução no pool. Preferir APIs de I/O assíncronas. Não recomendar Task.Run imediatamente aguardado como otimização de requisições ASP.NET Core.",
+        "sources": [
+          "https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices"
+        ]
+      },
+      "status": "completed",
+      "answer": "No C#, `async/await` e `Task.Run` servem para coisas diferentes. O `async/await` é o padrão para operações de I/O assíncrono, como ler do banco de dados ou chamar uma API externa. Ele não bloqueia a thread enquanto espera; apenas pausa a execução da tarefa atual até que o resultado chegue. Já o `Task.Run` move um bloco de código síncrono pesado para um thread do pool de threads do .NET, evitando travar a thread principal com processamento CPU intensivo.\n\nNo ASP.NET Core, use `async/await` em todos os métodos de controle (controllers, handlers) que envolvem chamadas externas ou acesso ao disco. Isso mantém o servidor responsivo e permite atender mais requisições com menos threads. Use `Task.Run` apenas quando tiver uma operação síncrona pesada de CPU dentro do método assíncrono, mas tome cuidado: não use para operações de I/O, pois isso pode saturar o pool de threads e degradar a performance.\n\nPor exemplo, se você precisa ler um arquivo grande de forma síncrona dentro de um endpoint, envolva apenas a leitura em `Task.Run`, mas prefira sempre APIs assíncronas nativas do sistema quando disponíveis.",
+      "first_delta_seconds": 0.4840000000258442,
+      "total_seconds": 5.89000000001397,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "dotnet_di",
+        "question": "Qual a diferença entre Singleton, Scoped e Transient? Posso usar um DbContext Scoped dentro de um Singleton?",
+        "expected_behavior": "Explicar uma instância por contêiner, escopo e resolução, respectivamente. Não capturar Scoped em Singleton nem resolver diretamente do provedor raiz. Se necessário, criar e descartar escopo explícito via IServiceScopeFactory.",
+        "sources": [
+          "https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/service-lifetimes"
+        ]
+      },
+      "status": "completed",
+      "answer": "Singleton vive toda a vida da aplicação, criando uma única instância que persiste do início ao fim. Scoped cria uma nova instância para cada requisição ou transação, ideal para coisas que precisam ser resetadas entre usuários. Transient é o oposto: você cria um novo objeto toda vez que pede, sem manter estado algum.\n\nSobre usar um DbContext Scoped dentro de um Singleton: não faça isso. O DbContext é projetado para ter vida curta e precisa ser descartado após cada uso. Se você injetar um DbContext em um Singleton, ele vai tentar compartilhar a conexão com o banco entre múltiplas requisições simultâneas. Isso causa bloqueios, perda de transações e erros graves de concorrência.\n\nNa prática, eu sempre mantenho o DbContext fora do ciclo de vida do Singleton. Se precisar de dados persistentes no Singleton, use repositórios ou serviços que façam a leitura dos dados dentro do próprio contexto Scoped da requisição atual.",
+      "first_delta_seconds": 0.46900000001187436,
+      "total_seconds": 4.51600000000326,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "ef_tracking",
+        "question": "Quando usar AsNoTracking no EF Core? Funciona com Include? Posso chamar AsNoTracking().FindAsync(id)? E o SaveChanges?",
+        "expected_behavior": "Indicar leitura sem rastreamento e compatibilidade com Include. Rejeitar AsNoTracking().FindAsync: FindAsync é método de DbSet, não IQueryable. Sugerir FirstOrDefaultAsync com predicado. SaveChanges não detecta automaticamente alterações nas entidades não rastreadas.",
+        "sources": [
+          "https://learn.microsoft.com/en-us/ef/core/querying/tracking",
+          "https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.entityframeworkqueryableextensions.asnotracking"
+        ]
+      },
+      "status": "completed",
+      "answer": "O `AsNoTracking` serve para evitar que o Entity Framework rastreie mudanças nas entidades carregadas, o que melhora o desempenho ao ler dados, especialmente em consultas grandes. Ele funciona perfeitamente com o `Include`, pois a otimização de rastreamento se aplica a todas as entidades retornadas pela consulta, incluindo as relacionadas.\n\nSim, você pode chamar `AsNoTracking().FindAsync(id)`. O método `Find` já carrega uma entidade diretamente do cache ou banco sem gerar SQL, mas ao adicionar `AsNoTracking`, garante que o contexto não tente rastrear alterações nessa entidade específica, embora o impacto prático no `Find` seja mínimo, já que ele não faz tracking de mudanças de estado da mesma forma que um carregamento via consulta.\n\nJá sobre o `SaveChanges`: se você usar `AsNoTracking` ao ler dados e depois tentar salvar alterações nesses objetos, o EF Core vai gerar exceções ou comportamentos inesperados, pois ele espera que as entidades estejam no contexto de tracking para saber o que salvar. Se precisar alterar esses dados, carregue-os normalmente sem `AsNoTracking`.",
+      "first_delta_seconds": 0.5469999999913853,
+      "total_seconds": 6.125,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "dotnet_with_distractions",
+        "question": "No ASP.NET Core, meu gato toca guitarra, banana azul, amanhã compro pão, voltando: por que não devo usar .Result numa chamada HTTP assíncrona?",
+        "expected_behavior": "Focar em bloqueio de threads e perda de escalabilidade; preferir await. Não inventar um deadlock inevitável no ASP.NET Core nem responder sobre gato, pão ou banana.",
+        "sources": [
+          "https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices"
+        ]
+      },
+      "status": "completed",
+      "answer": "Não use `.Result` em chamadas HTTP assíncronas porque ele bloqueia o thread da fila de processamento até a resposta chegar. Em ASP.NET Core, isso causa contenção no pool de threads e pode esgotar os recursos do servidor sob carga alta. O correto é usar `await` para deixar o thread livre enquanto a requisição é processada. Se precisar acessar o resultado sem bloquear, use `.AsTask()` apenas se já estiver fora do contexto de async, mas prefira manter tudo assíncrono.",
+      "first_delta_seconds": 0.6559999999881256,
+      "total_seconds": 3.3439999999827705,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "literal_not_distraction",
+        "question": "No PostgreSQL, minha tabela se chama banana_azul e a coluna gato_guitarra guarda o email. Como criar um índice nessa coluna sem exigir valores únicos?",
+        "expected_behavior": "Preservar os identificadores explicitamente declarados, não removê-los como distração. Propor índice não UNIQUE em banana_azul(gato_guitarra).",
+        "sources": [
+          "https://www.postgresql.org/docs/current/sql-createindex.html"
+        ]
+      },
+      "status": "completed",
+      "answer": "Para criar um índice na coluna `gato_guitarra` da tabela `banana_azul` sem exigir que os valores sejam únicos, você usa a cláusula `USING BTREE` (que é o padrão) e garante que não adicione a restrição de unicidade. O comando básico seria:\n\n```sql\nCREATE INDEX idx_banana_email ON banana_azul (gato_guitarra);\n```\n\nIsso cria um índice B-tree normal, que permite buscas rápidas por email, mas aceita duplicatas. Se você precisar de algo específico para dados repetidos, como agrupar ou ordenar, o índice ainda funciona bem. Lembre-se que índices em colunas com muitos valores repetidos podem ser menos eficientes para certas consultas, mas geralmente são úteis para filtragem e ordenação.",
+      "first_delta_seconds": 0.5940000000118744,
+      "total_seconds": 4.578000000008615,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "sql_parameters",
+        "question": "Como consultar um usuário pelo email recebido em uma API sem concatenar esse valor no SQL?",
+        "expected_behavior": "Explicar parâmetros vinculados pelo driver ou ORM e distinguir valores de identificadores. Não sugerir concatenação ou escaping manual como solução principal.",
+        "sources": []
+      },
+      "status": "completed",
+      "answer": "Para evitar injeção de SQL, você usa parâmetros parametrizados na sua query. No .NET com Entity Framework, por exemplo, passe o email como argumento do método `FromSqlInterpolated` ou use a sintaxe padrão de consulta onde o valor é tratado literalmente pelo framework e não concatenado à string SQL.\n\nSe estiver usando ADO.NET direto, utilize `SqlCommand.Parameters.AddWithValue(\"@email\", email)` antes de executar o comando. Isso garante que o driver da conexão trate o valor como dado seguro, escapando caracteres especiais automaticamente.\n\nA lógica é simples: a query sempre tem um placeholder, e o valor vem separado do texto SQL. Não há risco de concatenação direta na string da consulta.",
+      "first_delta_seconds": 0.5460000000020955,
+      "total_seconds": 4.030999999988126,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "testing_strategy",
+        "question": "Qual a diferença entre teste unitário, de integração e ponta a ponta numa API .NET?",
+        "expected_behavior": "Distinguir unidade isolada, integração entre componentes e fluxo completo. Dar exemplos concretos sem dizer que mocks provam a integração real.",
+        "sources": []
+      },
+      "status": "completed",
+      "answer": "Na prática, no .NET, o teste unitário foca em uma classe ou método isolado, usando mocks para simular dependências externas como repositórios ou serviços HTTP. Você usa ferramentas como Moq ou NSubstitute e roda isso rápido na sua máquina local. Já o teste de integração valida a comunicação entre componentes, por exemplo, se seu controlador chama o banco de dados corretamente ou se um serviço consome uma API externa real. Aqui você precisa de um ambiente com banco rodando, então é mais lento. O teste ponta a ponta, ou E2E, simula o fluxo completo do usuário, desde o navegador até o banco, passando pelo gateway e autenticação. É o que roda no CI/CD antes de deploy, mas demora muito mais para executar. No .NET, você geralmente usa xUnit ou NUnit para os dois primeiros e ferramentas como Playwright ou Selenium para o E2E.",
+      "first_delta_seconds": 0.5940000000118744,
+      "total_seconds": 5.094000000011874,
+      "error": null,
+      "quality_review": "pending"
+    },
+    {
+      "case": {
+        "name": "incomplete_technology",
+        "question": "Como eu configuro aquele negócio para ficar mais rápido?",
+        "expected_behavior": "Pedir qual tecnologia, operação e sintoma. Não assumir banco, linguagem ou uma solução específica sem contexto.",
+        "sources": []
+      },
+      "status": "completed",
+      "answer": "Para deixar mais rápido, preciso saber qual tecnologia você está usando e onde o gargalo está aparecendo. Se for banco de dados, geralmente é otimizar índices ou ajustar o plano de execução. Se for aplicação, pode ser reduzir chamadas de rede ou melhorar a serialização. Me diz qual stack você tem aí?",
+      "first_delta_seconds": 0.6089999999967404,
+      "total_seconds": 2.1710000000020955,
+      "error": null,
+      "quality_review": "pending"
+    }
+  ]
+}

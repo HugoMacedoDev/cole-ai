@@ -1,0 +1,66 @@
+[
+  {
+    "category": "RH e comportamento", "theme": "trajetória profissional",
+    "questions": ["Fale sobre você", "Conte sobre sua trajetória profissional", "Explique o conceito de trajetória profissional e quando ele é relevante em um projeto corporativo."],
+    "answer": "Eu estruturaria minha apresentação em três pontos: minha atuação atual, os problemas que sei resolver e o que busco desenvolver. Para mostrar um perfil analítico, escolheria um projeto real e explicaria como identifiquei o problema, comparei alternativas e avaliei o resultado. Complete essa apresentação com seu cargo, suas experiências e resultados verdadeiros; não declare experiências que não teve."
+  },
+  {
+    "category": "RH e comportamento", "theme": "pontos fortes",
+    "questions": ["Quais são seus pontos fortes?", "Qual é o seu principal ponto forte?"],
+    "answer": "Meu foco é analisar o problema antes de propor uma solução: esclarecer o objetivo, reunir evidências e comparar alternativas considerando impacto, custo e risco. Também procuro comunicar o raciocínio de forma clara para que a decisão seja compartilhada. Para personalizar, acrescente uma situação verdadeira em que esse modo de trabalhar ajudou a equipe."
+  },
+  {
+    "category": "RH e comportamento", "theme": "pontos de melhoria",
+    "questions": ["Quais são seus pontos de melhoria?", "Qual é o seu maior defeito?"],
+    "answer": "Eu escolheria um ponto real de desenvolvimento e explicaria o que faço para melhorar, sem usar uma qualidade disfarçada de defeito. Para um perfil analítico, um exemplo possível, se for verdadeiro para você, é equilibrar profundidade de análise com velocidade de decisão: definir prazo para investigar, priorizar os dados essenciais e decidir com o nível de informação adequado ao risco."
+  },
+  {
+    "category": "RH e comportamento", "theme": "resolução de conflitos",
+    "questions": ["Como você lida com conflitos na equipe?", "Como resolver divergências técnicas?"],
+    "answer": "Eu começaria ouvindo as pessoas e separando fatos, hipóteses e preferências. Depois, alinharia o objetivo comum e compararia as opções com critérios como impacto, prazo, manutenção e risco. Quando a divergência for técnica, proporia um teste pequeno para obter evidências. Se ainda houver impasse, levaria as alternativas e seus efeitos a quem tem responsabilidade pela decisão, mantendo respeito pela equipe."
+  },
+  {
+    "category": "RH e comportamento", "theme": "trabalho sob pressão",
+    "questions": ["Como você trabalha sob pressão?", "Como você lida com prazos apertados?"],
+    "answer": "Eu priorizaria o que traz maior impacto e identificaria dependências e riscos antes de assumir o prazo. Dividiria a entrega em etapas menores, negociaria escopo e comunicaria impedimentos cedo. Sob pressão, procuraria manter verificações essenciais e evitar mudanças grandes sem validação. Para demonstrar isso na entrevista, acrescentaria um exemplo real de prazo, decisão tomada e resultado."
+  },
+  {
+    "category": "RH e comportamento", "theme": "motivações",
+    "questions": ["Por que você quer trabalhar aqui?", "Por que você quer esta vaga?"],
+    "answer": "Eu relacionaria a vaga a problemas que tenho interesse em resolver, competências que posso oferecer e oportunidades de aprendizado. Pesquisaria o produto e os desafios da equipe para explicar essa conexão com fatos, sem elogios genéricos. Complete com algo verdadeiro sobre a empresa e sua experiência; não afirme conhecer a cultura interna sem evidência."
+  },
+  {
+    "category": "RH e comportamento", "theme": "pretensão salarial",
+    "questions": ["Qual é sua pretensão salarial?", "Qual a sua expectativa salarial?"],
+    "answer": "Prefiro alinhar a expectativa considerando o escopo da função, o regime de contratação, os benefícios e as responsabilidades. Minha faixa pretendida é [informe sua faixa real], e estou aberto a conversar sobre a composição da proposta. Substitua o campo antes de usar; a base não conhece sua pretensão salarial."
+  },
+  {
+    "category": "RH e comportamento", "theme": "fracasso em projetos",
+    "questions": ["Conte sobre um erro que você cometeu", "Conte sobre um projeto que deu errado"],
+    "answer": "Eu escolheria um episódio verdadeiro e explicaria o contexto, a decisão que tomei e o efeito observado. Assumiria minha responsabilidade sem atribuir toda a culpa a outras pessoas. Depois, descreveria como ajudei a corrigir o problema e qual mudança de processo, teste ou comunicação reduziu a chance de repetição. Se não tiver vivido esse cenário, diria isso e explicaria como agiria."
+  },
+  {
+    "category": "C# fundamentos", "theme": "async e await",
+    "questions": ["Qual a diferença entre async/await e Task.Run no ASP.NET Core?", "Em C#, qual é a diferença entre async/await e Task.Run? Quando usar cada um no ASP.NET Core?", "Em C#, qual é a diferença entre async/await e Task.Run? Quando usar cada um em uma aplicação ASP.NET Core?"],
+    "answer": "Eu usaria async/await para aguardar operações assíncronas sem bloquear a thread enquanto a operação está pendente. Isso não cria automaticamente outra thread. Task.Run agenda trabalho no pool. No ASP.NET Core, a requisição já executa no pool, então envolver código em Task.Run e aguardar imediatamente só adiciona agendamento; não resolve bloqueio nem torna I/O síncrono escalável. Eu preferiria APIs assíncronas nativas e avaliaria processamento em background para trabalho pesado, conforme o cenário.",
+    "sources": ["https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices"]
+  },
+  {
+    "category": ".NET e ASP.NET Core", "theme": "ciclos de vida DI",
+    "questions": ["Qual a diferença entre Singleton, Scoped e Transient?", "Qual a diferença entre Singleton, Scoped e Transient? Posso usar um DbContext Scoped dentro de um Singleton?", "No ASP.NET Core, qual é a diferença entre Singleton, Scoped e Transient na injeção de dependências? Posso injetar um serviço Scoped em um Singleton?"],
+    "answer": "Singleton compartilha uma instância no contêiner; Scoped compartilha uma instância por escopo, normalmente a requisição HTTP; Transient cria uma instância a cada resolução. Eu evitaria capturar um serviço Scoped, como DbContext, no construtor de um Singleton. Quando um serviço de longa duração precisa dele, criaria um escopo explícito com IServiceScopeFactory, resolveria a dependência dentro desse escopo e o descartaria depois do uso. Resolver pelo provedor raiz não corrige o ciclo de vida.",
+    "sources": ["https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection/service-lifetimes"]
+  },
+  {
+    "category": "Entity Framework e dados", "theme": "tracking e no-tracking",
+    "questions": ["Quando usar AsNoTracking no EF Core?", "Quando usar AsNoTracking no EF Core? Funciona com Include? Posso chamar AsNoTracking().FindAsync(id)? E o SaveChanges?", "No Entity Framework Core, quando usar AsNoTracking em uma consulta? Como isso afeta alterações nas entidades e SaveChanges?"],
+    "answer": "Eu usaria AsNoTracking em consultas de leitura quando não preciso que o contexto acompanhe alterações nas entidades retornadas. Ele funciona com Include. AsNoTracking retorna IQueryable, portanto não permite encadear FindAsync, que pertence ao DbSet; para buscar por chave nessa consulta, usaria FirstOrDefaultAsync com um predicado e trataria resultado nulo. SaveChanges não detecta automaticamente mudanças em objetos não rastreados. Para editar, eu consultaria com tracking ou anexaria a entidade e marcaria cuidadosamente as alterações.",
+    "sources": ["https://learn.microsoft.com/en-us/ef/core/querying/tracking", "https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.entityframeworkqueryableextensions.asnotracking"]
+  },
+  {
+    "category": ".NET e ASP.NET Core", "theme": "bloqueio assíncrono",
+    "questions": ["Por que não usar .Result no ASP.NET Core?", "Por que não devo usar .Result numa chamada HTTP assíncrona no ASP.NET Core?"],
+    "answer": "Eu evitaria .Result porque ele bloqueia a thread enquanto a operação não termina. Sob carga, isso reduz a capacidade de atender requisições e pode esgotar o pool. Eu manteria o fluxo assíncrono com await, desde o acesso externo até o endpoint. Não afirmaria que sempre haverá deadlock no ASP.NET Core: o problema central aqui é bloqueio e perda de escalabilidade.",
+    "sources": ["https://learn.microsoft.com/en-us/aspnet/core/fundamentals/best-practices"]
+  }
+]

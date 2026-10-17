@@ -30,6 +30,7 @@ class QuestionDetected(Event):
     sequence: int
     text: str
     simulated: bool = True
+    provisional: bool = False
 
 
 class AnswerStarted(Event):
@@ -79,4 +80,23 @@ class AudioLevel(Event):
 
 class AudioCaptureStopped(Event):
     type: Literal["audio.capture.stopped"] = "audio.capture.stopped"
+
+
+class TranscriptionStatus(Event):
+    type: Literal["transcription.status"] = "transcription.status"
+    status: Literal["listening", "transcribing", "answering", "error"]
+
+
+class TranscriptionCompleted(Event):
+    type: Literal["transcription.completed"] = "transcription.completed"
+    sequence: int
+    text: str
+    latency_ms: float
+    final: bool = True
+
+
+class AnswerActivity(Event):
+    type: Literal["answer.activity"] = "answer.activity"
+    active: bool
+    provisional: bool
 
